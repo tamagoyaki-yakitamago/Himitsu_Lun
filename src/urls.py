@@ -6,4 +6,5 @@ api = responder.API()
 @api.route("/")
 class Index:
     def on_get(self, req, res):
-        res.text = "hello, world!"
+        res.content = api.template("index.html")
+
