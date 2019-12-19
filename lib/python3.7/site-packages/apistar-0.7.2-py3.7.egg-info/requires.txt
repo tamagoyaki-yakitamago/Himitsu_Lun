@@ -1,5 +1,0 @@
-click
-jinja2
-requests
-pyyaml
-typesystem

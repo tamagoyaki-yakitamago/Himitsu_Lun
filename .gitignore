@@ -1,0 +1,7 @@
+# 不要なディレクトリ
+bin/
+include/
+lib/
+
+# 不要なファイル
+pyvenv.cfg
