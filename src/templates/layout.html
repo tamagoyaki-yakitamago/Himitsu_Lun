@@ -59,13 +59,13 @@
             var files = document.getElementById("customFile").files;
             if (files.length == 1) {
                 var file_size = document.getElementById("customFile").files[0].size;
-                if (0 < file_size && file_size < 1024 * 1024) {
+                if (0 < file_size && file_size < 1024 * 1024 * 50) {
                     var form = document.getElementById("upload-file-form");
                     form.submit();
                 }
                 else {
                     $(".error-message").addClass("alert-danger");
-                    $(".error-message").html("<strong>Alert!</strong> - This function can upload under 1 MB file.");
+                    $(".error-message").html("<strong>Alert!</strong> - This function can upload under 50 MB file.");
 
                 }
             }
