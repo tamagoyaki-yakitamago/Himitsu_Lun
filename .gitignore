@@ -2,6 +2,8 @@
 bin/
 include/
 lib/
+src/storage
 
 # 不要なファイル
 pyvenv.cfg
+src/static/js/himitsu_lun.js
