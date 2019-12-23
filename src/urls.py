@@ -1,6 +1,10 @@
 import responder
 
-from process import create_shares
+from process import (
+    check_if_filename_duplicated,
+    check_if_filename_exist,
+    create_shares,
+)
 
 api = responder.API()
 
@@ -53,3 +57,12 @@ class Index:
 
         res.content = api.template("index.html", message=message)
 
+
+@api.route("/{code}")
+class Decrypt:
+    def on_get(self, req, res, code):
+        # コードが正しいかチェック（ファイル存在チェック）
+        if check_if_filename_exist(code):
+            res.content = api.template("decrypt.html", code=code)
+        else:
+            res.status_code = api.status_codes.HTTP_400

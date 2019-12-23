@@ -7,9 +7,16 @@ from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 from Crypto.Protocol.SecretSharing import Shamir
 
+PATH = "storage/"
+
 # ファイル名がアップロードディレクトリ先で重複しているかをチェックする
 def check_if_filename_duplicated(filename):
-    return os.path.exists("storage/" + filename)
+    return os.path.exists(PATH + filename)
+
+
+# アップロードディレクトリ先で、ファイル名が存在しているかをチェックする
+def check_if_filename_exist(filename):
+    return os.path.exists(PATH + filename)
 
 
 # アップロードされたファイルからシェアを作成して返す
@@ -35,7 +42,7 @@ def create_shares(filename, content):
         return {}, "error"
 
     file_content = cipher.nonce + tag + ct
-    with open("storage/" + tmp_filename, "wb") as fo:
+    with open(PATH + tmp_filename, "wb") as fo:
         fo.write(cipher.nonce + tag + ct)
 
     return share_dict, tmp_filename
