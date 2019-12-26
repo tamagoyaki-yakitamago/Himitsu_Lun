@@ -9,6 +9,7 @@ from process import (
 )
 
 api = responder.API()
+one_mbyte = 1024 ** 2
 
 
 @api.route("/")
@@ -18,23 +19,45 @@ class Index:
 
     async def on_post(self, req, res):
         data = await req.media(format="files")
-        file = data["file"]
-        filename = file["filename"]
-        content = file["content"]
-        content_type = file["content-type"]
-        if len(content) > 10000000:
-            message = """
+        file = data.get("file")
+        filename = file.get("filename")
+        content = file.get("content")
+        content_type = file.get("content-type")
+
+        # 1. content_typeが"application/zip"か確認
+        if not content_type == "application/zip":
+            message = """1
             ひみつるんにアップロードする際に、問題が発生しました。<br>
             お手数ですが、時間をおいて再度アップロードしてください。<br>
             """
+            res.content = api.template("index.html", error_message=message)
+
+        # 2. ファイル拡張子が".zip"かどうか確認
+        elif not filename[-4:] == ".zip":
+            message = """2
+            ひみつるんにアップロードする際に、問題が発生しました。<br>
+            お手数ですが、時間をおいて再度アップロードしてください。<br>
+            """
+            res.content = api.template("index.html", error_message=message)
+
+        # 3. contentの容量が10MB以下かどうか確認
+        elif len(content) > 10 * one_mbyte:
+            message = """3
+            ひみつるんにアップロードする際に、問題が発生しました。<br>
+            お手数ですが、時間をおいて再度アップロードしてください。<br>
+            """
+            res.content = api.template("index.html", error_message=message)
+
         else:
             share_dict, tmp_filename = create_shares(filename, content)
 
             if tmp_filename == "error":
-                message = """
+                message = """4
                 ひみつるんにアップロードする際に、問題が発生しました。<br>
                 お手数ですが、時間をおいて再度アップロードしてください。<br>
                 """
+                res.content = api.template("index.html", error_message=message)
+
             else:
                 message = """
                 ひみつるんにアップロードが完了しました。<br>
@@ -57,7 +80,7 @@ class Index:
                     share_dict["3"].decode("utf-8"),
                 )
 
-        res.content = api.template("index.html", message=message)
+                res.content = api.template("index.html", message=message)
 
 
 @api.route("/{code}")
