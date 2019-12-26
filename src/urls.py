@@ -4,6 +4,8 @@ from process import (
     check_if_filename_duplicated,
     check_if_filename_exist,
     create_shares,
+    create_shares_for_decrypt,
+    decrypt_file,
 )
 
 api = responder.API()
@@ -66,3 +68,41 @@ class Decrypt:
             res.content = api.template("decrypt.html", code=code)
         else:
             res.status_code = api.status_codes.HTTP_400
+
+    async def on_post(self, req, res, code):
+        data = await req.media()
+        req_code = data.get("code")
+        # コードが正しいかチェック（ファイル存在チェック）
+        if not (check_if_filename_exist(code) and code == req_code):
+            res.status_code = api.status_codes.HTTP_400
+
+        share_id_list = []
+        share_id_list.append(data.get("shareid1"))
+        share_id_list.append(data.get("shareid2"))
+        share_list = []
+        share_list.append(data.get("share1"))
+        share_list.append(data.get("share2"))
+
+        # Noneが含まれていないか判定
+        flag = False
+        for share_id in share_id_list:
+            if share_id is None:
+                flag = True
+                break
+        if flag:
+            res.status_code = api.status_codes.HTTP_400
+        for share in share_list:
+            if share is None:
+                flag = True
+                break
+        if flag:
+            res.status_code = api.status_codes.HTTP_400
+
+        # 復元用のシェア配列を作成する
+        shares = create_shares_for_decrypt(share_id_list, share_list)
+
+        # codeからファイルを復元する
+        if not decrypt_file(code, shares):
+            res.status_code = api.status_codes.HTTP_400
+
+        api.redirect(res, "/")

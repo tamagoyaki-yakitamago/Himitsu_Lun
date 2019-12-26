@@ -47,3 +47,29 @@ def create_shares(filename, content):
 
     return share_dict, tmp_filename
 
+
+# 復元用のシェアを作成する
+def create_shares_for_decrypt(id_list, share_list):
+    shares = []
+    for i in range(2):
+        shares.append((int(id_list[i]), unhexlify(share_list[i])))
+
+    return shares
+
+
+# codeからファイルを復元する
+def decrypt_file(code, shares):
+    key = Shamir.combine(shares)
+
+    with open(PATH + code, "rb") as fi:
+        nonce, tag = [fi.read(16) for i in range(2)]
+        cipher = AES.new(key, AES.MODE_EAX, nonce)
+        try:
+            result = cipher.decrypt(fi.read())
+            cipher.verify(tag)
+
+            return True
+        except ValueError:
+
+            return False
+
