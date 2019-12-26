@@ -42,7 +42,7 @@ def create_shares(filename, content):
         return {}, "error"
 
     file_content = cipher.nonce + tag + ct
-    with open(PATH + tmp_filename, "wb") as fo:
+    with open(PATH + tmp_filename, "xb") as fo:
         fo.write(cipher.nonce + tag + ct)
 
     return share_dict, tmp_filename

@@ -9,8 +9,11 @@
                 {{ message|safe }}
             </div>
             {% endif %}
-            <div class="alert error-message" role="alert">
+            {% if error_message %}
+            <div class="alert alert-danger error-message" role="alert">
+                {{ error_message|safe }}
             </div>
+            {% endif %}
             <div class="form-group custom-file overflow-hidden rounded-pill mb-5">
                 <input type="file" class="custom-file-input rounded-pill" id="customFile" name="file">
                 <label for="customFile" class="custom-file-label rounded-pill">ファイル入力の例</label>
