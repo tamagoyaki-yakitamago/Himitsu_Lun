@@ -6,6 +6,9 @@ from binascii import hexlify, unhexlify
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 from Crypto.Protocol.SecretSharing import Shamir
+from models import Himitsu_lun
+from settings import session
+from datetime import datetime, date, timedelta
 
 PATH = "storage/"
 
@@ -35,17 +38,37 @@ def create_shares(filename, content):
     while try_count < 10:
         tmp_filename = secrets.token_hex(16)
         if not check_if_filename_duplicated(tmp_filename):
+            file_content = cipher.nonce + tag + ct
+            with open(PATH + tmp_filename, "wb") as fo:
+                fo.write(cipher.nonce + tag + ct)
+
+            insert_db(filename, share_dict)
             break
         try_count += 1
 
     if try_count >= 10:
         return {}, "error"
 
-    file_content = cipher.nonce + tag + ct
-    with open(PATH + tmp_filename, "xb") as fo:
-        fo.write(cipher.nonce + tag + ct)
-
     return share_dict, tmp_filename
+
+
+# データベースに登録する
+def insert_db(filename, share_dict):
+    himitsu_lun = Himitsu_lun()
+    now = datetime.now()
+
+    himitsu_lun.filename = filename
+    himitsu_lun.share_id = "3"
+    himitsu_lun.share = share_dict["3"].decode("utf-8")
+    himitsu_lun.created_at = now
+    himitsu_lun.delete_at = now + timedelta(days=3)
+
+    session.add(himitsu_lun)
+    session.commit()
+
+    shares = session.query(Himitsu_lun).all()
+    for share in shares:
+        print(f"{share.filename} {share.share} {share.delete_at}")
 
 
 # 復元用のシェアを作成する

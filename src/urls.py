@@ -62,22 +62,15 @@ class Index:
                 message = """
                 ひみつるんにアップロードが完了しました。<br>
                 データの復元をするには、次のURLにアクセスしてください。<br>
-                （データの復元には、3つのひみつるんきーのうち2つが必要です）<br>
                 <p class="url">http://localhost/%s</p>
                 <ul>
                 <li>ひみつるんきー：</li>
-                <li>#%s：%s</li>
-                <li>#%s：%s</li>
                 <li>#%s：%s</li>
                 </ul>
                 """ % (
                     tmp_filename,
                     "1",
                     share_dict["1"].decode("utf-8"),
-                    "2",
-                    share_dict["2"].decode("utf-8"),
-                    "3",
-                    share_dict["3"].decode("utf-8"),
                 )
 
                 res.content = api.template("index.html", message=message)

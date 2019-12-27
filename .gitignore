@@ -2,7 +2,9 @@
 bin/
 include/
 lib/
+storage
 src/storage
+src/__pycache__
 
 # 不要なファイル
 pyvenv.cfg
