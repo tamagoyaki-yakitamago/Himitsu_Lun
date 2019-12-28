@@ -10,6 +10,8 @@ from process import (
 
 api = responder.API()
 one_mbyte = 1024 ** 2
+# Content-type
+CONTENT_TYPE = {"zip": "application/zip"}
 
 
 @api.route("/")
@@ -92,33 +94,21 @@ class Decrypt:
         if not (check_if_filename_exist(code) and code == req_code):
             res.status_code = api.status_codes.HTTP_400
 
-        share_id_list = []
-        share_id_list.append(data.get("shareid1"))
-        share_id_list.append(data.get("shareid2"))
-        share_list = []
-        share_list.append(data.get("share1"))
-        share_list.append(data.get("share2"))
+        share = data.get("share")
 
         # Noneが含まれていないか判定
-        flag = False
-        for share_id in share_id_list:
-            if share_id is None:
-                flag = True
-                break
-        if flag:
-            res.status_code = api.status_codes.HTTP_400
-        for share in share_list:
-            if share is None:
-                flag = True
-                break
-        if flag:
+        if share is None:
             res.status_code = api.status_codes.HTTP_400
 
         # 復元用のシェア配列を作成する
-        shares = create_shares_for_decrypt(share_id_list, share_list)
+        shares = create_shares_for_decrypt(code, share)
 
         # codeからファイルを復元する
-        if not decrypt_file(code, shares):
+        content, filename = decrypt_file(code, shares)
+        if content == "error":
             res.status_code = api.status_codes.HTTP_400
 
-        api.redirect(res, "/")
+        res.headers["Content-Type"] = CONTENT_TYPE.get("zip")
+        res.headers["Content-Disposition"] = "attachment; filename=" + filename
+        res.content = content
+

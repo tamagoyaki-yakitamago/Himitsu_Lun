@@ -42,7 +42,7 @@ def create_shares(filename, content):
             with open(PATH + tmp_filename, "wb") as fo:
                 fo.write(cipher.nonce + tag + ct)
 
-            insert_db(filename, share_dict)
+            insert_db(filename, tmp_filename, share_dict)
             break
         try_count += 1
 
@@ -53,11 +53,12 @@ def create_shares(filename, content):
 
 
 # データベースに登録する
-def insert_db(filename, share_dict):
+def insert_db(filename, tmp_filename, share_dict):
     himitsu_lun = Himitsu_lun()
     now = datetime.now()
 
     himitsu_lun.filename = filename
+    himitsu_lun.enc_filename = tmp_filename
     himitsu_lun.share_id = "3"
     himitsu_lun.share = share_dict["3"].decode("utf-8")
     himitsu_lun.created_at = now
@@ -72,10 +73,11 @@ def insert_db(filename, share_dict):
 
 
 # 復元用のシェアを作成する
-def create_shares_for_decrypt(id_list, share_list):
-    shares = []
-    for i in range(2):
-        shares.append((int(id_list[i]), unhexlify(share_list[i])))
+def create_shares_for_decrypt(code, share):
+    db_share = (
+        session.query(Himitsu_lun).filter(Himitsu_lun.enc_filename == code).first()
+    )
+    shares = [(1, unhexlify(share)), (3, unhexlify(f"{db_share.share}"))]
 
     return shares
 
@@ -83,6 +85,10 @@ def create_shares_for_decrypt(id_list, share_list):
 # codeからファイルを復元する
 def decrypt_file(code, shares):
     key = Shamir.combine(shares)
+    db_share = (
+        session.query(Himitsu_lun).filter(Himitsu_lun.enc_filename == code).first()
+    )
+    filename = f"{db_share.filename}"
 
     with open(PATH + code, "rb") as fi:
         nonce, tag = [fi.read(16) for i in range(2)]
@@ -91,8 +97,8 @@ def decrypt_file(code, shares):
             result = cipher.decrypt(fi.read())
             cipher.verify(tag)
 
-            return True
+            return result, filename
         except ValueError:
 
-            return False
+            return "error", ""
 

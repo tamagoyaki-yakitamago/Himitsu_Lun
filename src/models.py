@@ -11,6 +11,7 @@ class Himitsu_lun(Base):
 
     id = Column(Integer, primary_key=True)
     filename = Column(String(255), nullable=False)
+    enc_filename = Column(String(255), nullable=False)
     share_id = Column(Integer, nullable=False)
     share = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.now, nullable=False)
