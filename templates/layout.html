@@ -34,17 +34,28 @@
 </head>
 
 <body>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <div class="collapse navbar-collapse justify-content-center" id="navbar1">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" href="#" data-toggle="modal" data-target="#Modal1">ひみつるんとは</a>
+                <a class="nav-item nav-link" href="#" data-toggle="modal" data-target="#Modal2">使い方</a>
+                <a class="nav-item nav-link" href="#" data-toggle="modal" data-target="#Modal3">よくある質問</a>
+                <a class="nav-item nav-link" href="#" data-toggle="modal" data-target="#Modal4">プライバシーポリシー</a>
+            </div>
+        </div>
+    </nav>
+
     <main role="main" class="container">
         <div class="container p-5">
             <div class="row mb-5 text-center">
                 <div class="col-lg-10 mx-auto">
-                    <h1 class="display-4">File upload button </h1>
-                    <p class="lead">Build a simple file upload button using Bootstrap 4.</p>
+                    <h1 class="display-4">ひみつるん</h1>
+                    <p class="lead">より安全にファイルを共有する</p>
                 </div>
             </div>
 
             {% block content %}
-            <!-- コンテンツ部分はここに入る -->
+            <!-- コンテンツ部分 -->
             {% endblock %}
         </div>
     </main>
@@ -84,5 +95,105 @@
     </script>
 
 </body>
+
+<!-- Modal -->
+<!-- Modal1 -->
+<div class="modal fade" id="Modal1" tabindex="-1" role="dialog" aria-labelledby="Modal1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">ひみつるんとは</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>ひみつるんは、無料で利用できるファイル共有サービスです。</p>
+                <p>ファイルをより安全に共有することができます。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-button rounded-pill"
+                    data-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal2 -->
+<div class="modal fade" id="Modal2" tabindex="-1" role="dialog" aria-labelledby="Modal2">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">使い方</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ol>
+                    <li>共有するファイルをアップロードします。</li>
+                    <li>表示されるURLとひみつるんきーを、共有する相手に伝えます。</li>
+                    <li>URLにアクセス後、コードを入力することで、ファイルを共有できます。</li>
+                </ol>
+                <p class="warning"><strong>！注意！</strong>：URLとひみつるんきーを知っている人はだれでも、ファイルを取得できます。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-button rounded-pill"
+                    data-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal3 -->
+<div class="modal fade" id="Modal3" tabindex="-1" role="dialog" aria-labelledby="Modal3">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">よくある質問</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6>Q. ひみつるんにアップロードされたファイルはどのように保管されているか。</h6>
+                <p>A. 秘密分散共有法という暗号技術で暗号化されたファイルが保管されています。<br>もとのアップロードされたファイルは保管していません。</p>
+                <hr>
+                <h6>Q. URLとひみつるんきーの有効期限はいつまでか。</h6>
+                <p>A. 原則アップロード後72時間後まで有効です。<br>72時間後、アップロードされたファイルは順次削除されますが、タイムラグにより多少伸びる場合があります。</p>
+                <hr>
+                <h6>Q. URL/ひみつるんきーを紛失してしまった。</h6>
+                <p>A. URL/ひみつるんきーの再発行は対応しかねます。<br>必要に応じて再アップロードしてください。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-button rounded-pill"
+                    data-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal4 -->
+<div class="modal fade" id="Modal4" tabindex="-1" role="dialog" aria-labelledby="Modal4">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">プライバシーポリシー</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6>Cookieについて</h6>
+                <p>A. ひみつるんでは、Googleアナリティクスを使用しています。</p>
+                <hr>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-button rounded-pill"
+                    data-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </html>

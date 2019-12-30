@@ -2,6 +2,10 @@ body {
     padding-top: 5rem;
 }
 
+.warning {
+    color: red;
+}
+
 .starter-template {
     padding: 3rem 1.5rem;
     text-align: center;
@@ -24,5 +28,17 @@ body {
 }
 
 .custom-input-label.rounded-pill {
+    border-radius: 5rem;
+}
+
+.modal-button.rounded-pill {
+    border-radius: 5rem;
+}
+
+.modal-button.rounded-pill::after {
+    border-radius: 0 5rem 5rem 0;
+}
+
+.modal-button.rounded-pill {
     border-radius: 5rem;
 }
