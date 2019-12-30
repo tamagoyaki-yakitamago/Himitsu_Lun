@@ -12,6 +12,15 @@ from datetime import datetime, date, timedelta
 
 PATH = "storage/"
 
+# 指定したレスポンスヘッダを付与する
+def add_response_headers(res):
+    res.headers["X-Frame-Options"] = "SAMEORIGIN"
+    res.headers["X-XSS-Protection"] = "1; mode=block"
+    res.headers["X-Content-Type-Options"] = "nosniff"
+
+    return res
+
+
 # ファイル名がアップロードディレクトリ先で重複しているかをチェックする
 def check_if_filename_duplicated(filename):
     return os.path.exists(PATH + filename)
