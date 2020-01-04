@@ -13,6 +13,7 @@ api = responder.API()
 one_mbyte = 1024 ** 2
 # Content-Type
 CONTENT_TYPE = {"zip": "application/zip"}
+URL = "http://localhost/"
 
 
 @api.route("/")
@@ -77,12 +78,13 @@ class Index:
                 message = """
                 ひみつるんにアップロードが完了しました。<br>
                 データの復元をするには、次のURLにアクセスしてください。<br>
-                <p class="url">http://localhost/%s</p>
+                <p class="url">%s%s</p>
                 <ul>
                 <li>ひみつるんきー：</li>
                 <li>#%s：%s</li>
                 </ul>
                 """ % (
+                    URL,
                     tmp_filename,
                     "1",
                     share_dict["1"].decode("utf-8"),

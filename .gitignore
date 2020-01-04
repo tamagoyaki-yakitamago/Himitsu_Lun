@@ -5,6 +5,7 @@ lib/
 storage
 src/storage
 src/__pycache__
+secure/
 
 # 不要なファイル
 pyvenv.cfg
