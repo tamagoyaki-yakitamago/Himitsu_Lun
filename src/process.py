@@ -25,6 +25,7 @@ def add_response_headers(res):
 
 # DB登録用のシェア情報を暗号化する（OCBモード）
 def enc_db_share(share):
+    """
     with open("secure/key.txt", "rb") as f:
         key = f.read()
         header = b"header"
@@ -41,10 +42,27 @@ def enc_db_share(share):
         enc_result = json.dumps(dict(zip(json_k, json_v)))
 
         return enc_result
+    """
+
+    key = os.environ.get("KEY").encode("utf-8")
+    header = b"header"
+    share = share.encode("utf-8")
+    cipher = AES.new(key, AES.MODE_OCB)
+    cipher.update(header)
+    cipher_text, tag = cipher.encrypt_and_digest(share)
+
+    json_k = ["nonce", "header", "cipher_text", "tag"]
+    json_v = [
+        b64encode(x).decode("utf-8") for x in (cipher.nonce, header, cipher_text, tag)
+    ]
+    enc_result = json.dumps(dict(zip(json_k, json_v)))
+
+    return enc_result
 
 
 # DB登録用のシェア情報を復号する（OCBモード）
 def dec_db_share(nonce, header, cipher_text, tag):
+    """
     with open("secure/key.txt", "rb") as f:
         key = f.read()
         json_k = ["nonce", "header", "cipher_text", "tag"]
@@ -63,6 +81,24 @@ def dec_db_share(nonce, header, cipher_text, tag):
         except (ValueError, KeyError):
 
             return "Incorrect decryption"
+    """
+    key = os.environ.get("KEY").encode("utf-8")
+    json_k = ["nonce", "header", "cipher_text", "tag"]
+    json_v = [x for x in (nonce, header, cipher_text, tag)]
+    result = json.dumps(dict(zip(json_k, json_v)))
+
+    try:
+        b64 = json.loads(result)
+        jv = {k: b64decode(b64[k]) for k in json_k}
+
+        cipher = AES.new(key, AES.MODE_OCB, nonce=jv["nonce"])
+        cipher.update(jv["header"])
+        plain_text = cipher.decrypt_and_verify(jv["cipher_text"], jv["tag"])
+
+        return plain_text.decode("utf-8")
+    except (ValueError, KeyError):
+
+        return "Incorrect decryption"
 
 
 # ファイル名がアップロードディレクトリ先で重複しているかをチェックする

@@ -2,7 +2,6 @@
 bin/
 include/
 lib/
-storage
 src/storage
 src/__pycache__
 secure/
