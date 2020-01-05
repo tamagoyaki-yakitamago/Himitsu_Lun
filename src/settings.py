@@ -1,14 +1,23 @@
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 
 # データベース接続情報
-DATABASE = "postgresql"
-USER = "postgres"
-PASSWORD = "postgres"
-HOST = "db"
-PORT = "543２"
-DB_NAME = "himitsu_lun_db"
+with open("secure/authentication.txt", "r") as f:
+    DATABASE = f.readline()
+    DATABASE = DATABASE.rstrip(os.linesep)
+    USER = f.readline()
+    USER = USER.rstrip(os.linesep)
+    PASSWORD = f.readline()
+    PASSWORD = PASSWORD.rstrip(os.linesep)
+    HOST = f.readline()
+    HOST = HOST.rstrip(os.linesep)
+    PORT = f.readline()
+    PORT = PORT.rstrip(os.linesep)
+    DB_NAME = f.readline()
+    DB_NAME = DB_NAME.rstrip(os.linesep)
 
 CONNECT_STR = "{}://{}:{}@{}:{}/{}".format(
     DATABASE, USER, PASSWORD, HOST, PORT, DB_NAME

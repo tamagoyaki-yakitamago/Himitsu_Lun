@@ -67,7 +67,8 @@
         });
 
         $('.file-upload').on('click', function () {
-            $(".error-message").html("");
+            console.log($(".file-upload-error-message").html());
+            $(".file-upload-error-message").html("");
             var files = document.getElementById("customFile").files;
             if (files.length == 1) {
                 var file_size = document.getElementById("customFile").files[0].size;
@@ -76,14 +77,14 @@
                     form.submit();
                 }
                 else {
-                    $(".error-message").addClass("alert-danger");
-                    $(".error-message").html("<strong>Alert!</strong> - This function can upload under 10 MB file.");
+                    $(".file-upload-error-message").addClass("alert-danger");
+                    $(".file-upload-error-message").html("<strong>Alert!</strong> - This function can upload under 10 MB file.");
 
                 }
             }
             else {
-                $(".error-message").addClass("alert-danger");
-                $(".error-message").html("<strong>Alert!</strong> - Please upload only one file.");
+                $(".file-upload-error-message").addClass("alert-danger");
+                $(".file-upload-error-message").html("<strong>Alert!</strong> - Please upload only one file.");
 
             }
         });
