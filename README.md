@@ -45,7 +45,6 @@ if (Is the filename exist?) then (yes)
   else (no)
     :alert error message;
   endif
-  :create and share shares;
 else (no)
   :alert error message;
 endif
