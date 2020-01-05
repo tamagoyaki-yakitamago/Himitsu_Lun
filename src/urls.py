@@ -125,6 +125,10 @@ class Decrypt:
         # 復元用のシェア配列を作成する
         shares = create_shares_for_decrypt(code, share)
 
+        if shares == "error":
+            res.headers["Content-Type"] = "text/html; charset=utf-8"
+            res.status_code = api.status_codes.HTTP_400
+
         # codeからファイルを復元する
         content, filename = decrypt_file(code, shares)
         if content == "error":

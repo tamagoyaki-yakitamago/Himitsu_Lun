@@ -45,8 +45,6 @@ def enc_db_share(share):
 
 # DB登録用のシェア情報を復号する（OCBモード）
 def dec_db_share(nonce, header, cipher_text, tag):
-    print(nonce)
-    print(type(nonce))
     with open("secure/key.txt", "rb") as f:
         key = f.read()
         json_k = ["nonce", "header", "cipher_text", "tag"]
@@ -60,10 +58,11 @@ def dec_db_share(nonce, header, cipher_text, tag):
             cipher = AES.new(key, AES.MODE_OCB, nonce=jv["nonce"])
             cipher.update(jv["header"])
             plain_text = cipher.decrypt_and_verify(jv["cipher_text"], jv["tag"])
-        except (ValueError, KeyError):
-            print("Incorrect decryption")
 
-    return plain_text.decode("utf-8")
+            return plain_text.decode("utf-8")
+        except (ValueError, KeyError):
+
+            return "Incorrect decryption"
 
 
 # ファイル名がアップロードディレクトリ先で重複しているかをチェックする
@@ -126,10 +125,6 @@ def insert_db(filename, tmp_filename, share_dict):
     session.add(himitsu_lun)
     session.commit()
 
-    shares = session.query(Himitsu_lun).all()
-    for share in shares:
-        print(f"{share.filename} {share.share} {share.delete_at}")
-
 
 # 復元用のシェアを作成する
 def create_shares_for_decrypt(code, share):
@@ -142,6 +137,9 @@ def create_shares_for_decrypt(code, share):
         f"{db_share.share}",
         f"{db_share.tag}",
     )
+    if db_dec_share == "Incorrect decryption":
+        return "error"
+
     shares = [(1, unhexlify(share)), (3, unhexlify(db_dec_share))]
 
     return shares
