@@ -18,7 +18,33 @@ start
 
 start
 
-if (File can upload?) then (yes)
+if (Can the file be upload?) then (yes)
+  :create and share shares;
+else (no)
+  :alert error message;
+endif
+
+stop
+
+@enduml
+```
+
+### ダウンロード概要
+
+```plantuml
+@startuml
+
+start
+:File upload;
+
+start
+
+if (Is the filename exist?) then (yes)
+  if (Is the code correct?) then (yes)
+    : Decrypt and download files;
+  else (no)
+    :alert error message;
+  endif
   :create and share shares;
 else (no)
   :alert error message;
