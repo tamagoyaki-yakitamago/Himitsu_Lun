@@ -1,7 +1,9 @@
 import os
 import re
 import secrets
+import string
 import json
+import binascii
 
 from base64 import b64encode, b64decode
 from binascii import hexlify, unhexlify
@@ -50,7 +52,8 @@ def delete_file():
 
 # DB登録用のシェア情報を暗号化する（CTRモード）
 def enc_db_share(share):
-    key = os.environ.get("KEY").encode("utf-8")
+    with open("secure/key.txt", "rb") as f:
+        key = f.read()
 
     share = share.encode("utf-8")
     cipher = AES.new(key, AES.MODE_CTR)
@@ -64,7 +67,8 @@ def enc_db_share(share):
 
 # DB登録用のシェア情報を復号する（CRTモード）
 def dec_db_share(nonce, cipher_text):
-    key = os.environ.get("KEY").encode("utf-8")
+    with open("secure/key.txt", "rb") as f:
+        key = f.read()
 
     try:
         b64 = json.loads(json.dumps({"nonce": nonce, "cipher_text": cipher_text}))
@@ -75,6 +79,21 @@ def dec_db_share(nonce, cipher_text):
         return plain_text.decode("utf-8")
     except (ValueError, KeyError):
         return "Incorrect decryption"
+
+
+# ファイル名が指定した形式化をチェックする
+def check_if_filename_match(filename):
+    # ファイル名の文字数チェック
+    if not len(filename) == 64:
+        return False
+    # ファイル名の形式チェック
+    flag = True
+    for char in filename:
+        if not char in string.hexdigits:
+            flag = False
+            break
+
+    return flag
 
 
 # ファイル名がアップロードディレクトリ先で重複しているかをチェックする
@@ -101,7 +120,7 @@ def create_shares(filename, content):
 
     try_count = 0
     while try_count < 10:
-        tmp_filename = secrets.token_hex(16)
+        tmp_filename = secrets.token_hex()
         if not check_if_filename_duplicated(tmp_filename):
             file_content = cipher.nonce + tag + ct
             with open(PATH + tmp_filename, "wb") as fo:
@@ -138,16 +157,20 @@ def insert_db(filename, tmp_filename, share_dict):
 
 # 復元用のシェアを作成する
 def create_shares_for_decrypt(code, share):
-    db_share = (
-        session.query(Himitsu_lun).filter(Himitsu_lun.enc_filename == code).first()
-    )
-    db_dec_share = dec_db_share(f"{db_share.nonce}", f"{db_share.share}")
-    if db_dec_share == "Incorrect decryption":
+    try:
+        db_share = (
+            session.query(Himitsu_lun).filter(Himitsu_lun.enc_filename == code).first()
+        )
+        db_dec_share = dec_db_share(f"{db_share.nonce}", f"{db_share.share}")
+        if db_dec_share == "Incorrect decryption":
+            return "error"
+
+        shares = [(1, unhexlify(share)), (3, unhexlify(db_dec_share))]
+
+        return shares
+
+    except binascii.Error:
         return "error"
-
-    shares = [(1, unhexlify(share)), (3, unhexlify(db_dec_share))]
-
-    return shares
 
 
 # codeからファイルを復元する

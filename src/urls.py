@@ -3,6 +3,7 @@ import responder
 from process import (
     add_response_headers,
     delete_file,
+    check_if_filename_match,
     check_if_filename_duplicated,
     check_if_filename_exist,
     create_shares,
@@ -103,42 +104,65 @@ class Decrypt:
         res.headers["Content-Type"] = "text/html; charset=utf-8"
         delete_file()
 
+        # コードの形式チェック
+        if not check_if_filename_match(code):
+            res.status_code = api.status_codes.HTTP_400
+
         # コードが正しいかチェック（ファイル存在チェック）
-        if check_if_filename_exist(code):
+        if not res.status_code == 400:
+            if not check_if_filename_exist(code):
+                res.status_code = api.status_codes.HTTP_400
+
+        if not res.status_code == 400:
             res.content = api.template("decrypt.html", code=code)
         else:
-            res.status_code = api.status_codes.HTTP_400
+            res.content = api.template("error.html")
 
     async def on_post(self, req, res, code):
         res = add_response_headers(res)
         data = await req.media()
         req_code = data.get("code")
+
+        # コードの形式チェック（code）
+        if not check_if_filename_match(code):
+            res.status_code = api.status_codes.HTTP_400
+
+        # コードの形式チェック（req_code）
+        if not res.status_code == 400:
+            if not check_if_filename_match(req_code):
+                res.status_code = api.status_codes.HTTP_400
+
         # コードが正しいかチェック（ファイル存在チェック）
-        if not (check_if_filename_exist(code) and code == req_code):
+        if not res.status_code == 400:
+            if not (check_if_filename_exist(code) and code == req_code):
+                res.status_code = api.status_codes.HTTP_400
+
+        if not res.status_code == 400:
+            share = data.get("share")
+
+            # Noneが含まれていないか判定
+            if not res.status_code == 400:
+                if share is None:
+                    res.status_code = api.status_codes.HTTP_400
+
+            # 復元用のシェア配列を作成する
+            if not res.status_code == 400:
+                shares = create_shares_for_decrypt(code, share)
+
+            if not res.status_code == 400:
+                if shares == "error":
+                    res.status_code = api.status_codes.HTTP_400
+
+            # codeからファイルを復元する
+            if not res.status_code == 400:
+                content, filename = decrypt_file(code, shares)
+                if content == "error":
+                    res.status_code = api.status_codes.HTTP_400
+
+        if not res.status_code == 400:
+            res.headers["Content-Type"] = CONTENT_TYPE.get("zip")
+            res.headers["Content-Disposition"] = "attachment; filename=" + filename
+            res.content = content
+        else:
             res.headers["Content-Type"] = "text/html; charset=utf-8"
-            res.status_code = api.status_codes.HTTP_400
-
-        share = data.get("share")
-
-        # Noneが含まれていないか判定
-        if share is None:
-            res.headers["Content-Type"] = "text/html; charset=utf-8"
-            res.status_code = api.status_codes.HTTP_400
-
-        # 復元用のシェア配列を作成する
-        shares = create_shares_for_decrypt(code, share)
-
-        if shares == "error":
-            res.headers["Content-Type"] = "text/html; charset=utf-8"
-            res.status_code = api.status_codes.HTTP_400
-
-        # codeからファイルを復元する
-        content, filename = decrypt_file(code, shares)
-        if content == "error":
-            res.headers["Content-Type"] = "text/html; charset=utf-8"
-            res.status_code = api.status_codes.HTTP_400
-
-        res.headers["Content-Type"] = CONTENT_TYPE.get("zip")
-        res.headers["Content-Disposition"] = "attachment; filename=" + filename
-        res.content = content
-
+            res.content = api.template("error.html")
