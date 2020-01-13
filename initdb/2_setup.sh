@@ -7,8 +7,6 @@ create table himitsu_lun_table (
     share_id integer not null,
     share varchar(255) not null,
     nonce varchar(255) not null,
-    header varchar(255) not null,
-    tag varchar(255) not null,
     created_at timestamp not null,
     delete_at timestamp not null);
 EOSQL

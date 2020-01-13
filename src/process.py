@@ -48,42 +48,32 @@ def delete_file():
     session.commit()
 
 
-# DB登録用のシェア情報を暗号化する（OCBモード）
+# DB登録用のシェア情報を暗号化する（CTRモード）
 def enc_db_share(share):
     key = os.environ.get("KEY").encode("utf-8")
-    header = b"header"
-    share = share.encode("utf-8")
-    cipher = AES.new(key, AES.MODE_OCB)
-    cipher.update(header)
-    cipher_text, tag = cipher.encrypt_and_digest(share)
 
-    json_k = ["nonce", "header", "cipher_text", "tag"]
-    json_v = [
-        b64encode(x).decode("utf-8") for x in (cipher.nonce, header, cipher_text, tag)
-    ]
-    enc_result = json.dumps(dict(zip(json_k, json_v)))
+    share = share.encode("utf-8")
+    cipher = AES.new(key, AES.MODE_CTR)
+    ct_bytes = cipher.encrypt(share)
+    nonce = b64encode(cipher.nonce).decode("utf-8")
+    ct = b64encode(ct_bytes).decode("utf-8")
+    enc_result = json.dumps({"nonce": nonce, "cipher_text": ct})
 
     return enc_result
 
 
-# DB登録用のシェア情報を復号する（OCBモード）
-def dec_db_share(nonce, header, cipher_text, tag):
+# DB登録用のシェア情報を復号する（CRTモード）
+def dec_db_share(nonce, cipher_text):
     key = os.environ.get("KEY").encode("utf-8")
-    json_k = ["nonce", "header", "cipher_text", "tag"]
-    json_v = [x for x in (nonce, header, cipher_text, tag)]
-    result = json.dumps(dict(zip(json_k, json_v)))
 
     try:
-        b64 = json.loads(result)
-        jv = {k: b64decode(b64[k]) for k in json_k}
-
-        cipher = AES.new(key, AES.MODE_OCB, nonce=jv["nonce"])
-        cipher.update(jv["header"])
-        plain_text = cipher.decrypt_and_verify(jv["cipher_text"], jv["tag"])
-
+        b64 = json.loads(json.dumps({"nonce": nonce, "cipher_text": cipher_text}))
+        dec_nonce = b64decode(b64["nonce"])
+        dec_ct = b64decode(b64["cipher_text"])
+        cipher = AES.new(key, AES.MODE_CTR, nonce=dec_nonce)
+        plain_text = cipher.decrypt(dec_ct)
         return plain_text.decode("utf-8")
     except (ValueError, KeyError):
-
         return "Incorrect decryption"
 
 
@@ -139,8 +129,6 @@ def insert_db(filename, tmp_filename, share_dict):
     himitsu_lun.share_id = "3"
     himitsu_lun.share = enc_json["cipher_text"]
     himitsu_lun.nonce = enc_json["nonce"]
-    himitsu_lun.header = enc_json["header"]
-    himitsu_lun.tag = enc_json["tag"]
     himitsu_lun.created_at = now
     himitsu_lun.delete_at = now + timedelta(days=3)
 
@@ -153,12 +141,7 @@ def create_shares_for_decrypt(code, share):
     db_share = (
         session.query(Himitsu_lun).filter(Himitsu_lun.enc_filename == code).first()
     )
-    db_dec_share = dec_db_share(
-        f"{db_share.nonce}",
-        f"{db_share.header}",
-        f"{db_share.share}",
-        f"{db_share.tag}",
-    )
+    db_dec_share = dec_db_share(f"{db_share.nonce}", f"{db_share.share}")
     if db_dec_share == "Incorrect decryption":
         return "error"
 

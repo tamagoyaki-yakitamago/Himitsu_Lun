@@ -15,8 +15,6 @@ class Himitsu_lun(Base):
     share_id = Column(Integer, nullable=False)
     share = Column(String(255), nullable=False)
     nonce = Column(String(255), nullable=False)
-    header = Column(String(255), nullable=False)
-    tag = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.now, nullable=False)
     delete_at = Column(DateTime, default=datetime.now, nullable=False)
 
