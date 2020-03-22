@@ -4,10 +4,9 @@ include/
 lib/
 src/storage
 src/__pycache__
-secure/
+storage
 
 # 不要なファイル
 pyvenv.cfg
 src/static/js/himitsu_lun.js
-Dockerfile
-docker-compose.yml
+secure/key.txt

@@ -52,6 +52,11 @@ def delete_file():
 
 # DB登録用のシェア情報を暗号化する（CTRモード）
 def enc_db_share(share):
+    if not os.path.exists("secure/key.txt"):
+        key = get_random_bytes(16)
+        with open("secure/key.txt", "wb") as f:
+            f.write(key)
+
     with open("secure/key.txt", "rb") as f:
         key = f.read()
 
@@ -65,8 +70,13 @@ def enc_db_share(share):
     return enc_result
 
 
-# DB登録用のシェア情報を復号する（CRTモード）
+# DB登録用のシェア情報を復号する（CTRモード）
 def dec_db_share(nonce, cipher_text):
+    if not os.path.exists("secure/key.txt"):
+        key = get_random_bytes(16)
+        with open("secure/key.txt", "wb") as f:
+            f.write(key)
+            
     with open("secure/key.txt", "rb") as f:
         key = f.read()
 

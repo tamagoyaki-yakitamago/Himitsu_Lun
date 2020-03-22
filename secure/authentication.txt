@@ -1,0 +1,6 @@
+postgresql
+postgres
+postgres
+db
+5432
+himitsu_lun_db

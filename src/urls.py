@@ -22,7 +22,7 @@ URL = "http://localhost/"
 class Index:
     def on_get(self, req, res):
         res = add_response_headers(res)
-        delete_file()
+        # delete_file()
         res.headers["Content-Type"] = "text/html; charset=utf-8"
 
         res.content = api.template("index.html")
@@ -102,7 +102,7 @@ class Decrypt:
     def on_get(self, req, res, code):
         res = add_response_headers(res)
         res.headers["Content-Type"] = "text/html; charset=utf-8"
-        delete_file()
+        # delete_file()
 
         # コードの形式チェック
         if not check_if_filename_match(code):
