@@ -24,4 +24,4 @@ ADD . /code/
 
 RUN pip install pipenv
 RUN pipenv --python 3.7
-RUN pipenv sync
+RUN pipenv install -r ./requirements.txt
