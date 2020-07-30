@@ -39,7 +39,7 @@ toml==0.10.0
 typed-ast==1.4.0
 typesystem==0.2.4
 urllib3==1.25.7
-uvicorn==0.10.8
+uvicorn==0.10.*
 uvloop==0.14.0
 websockets==8.1
 whitenoise==5.0.1
